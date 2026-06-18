@@ -1,0 +1,32 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.navbar-brand {
+    font-size: 1.1rem;
+}
+
+.footer {
+    background-color: #e9ecef;
+    border-top: 1px solid #dee2e6;
+}
+
+.table th {
+    white-space: nowrap;
+}
+
+.card {
+    border-radius: 0.5rem;
+}
+
+dt {
+    font-weight: 600;
+}
+
+dd {
+    margin-bottom: 0;
+}
+
+code {
+    color: #6f42c1;
+}
