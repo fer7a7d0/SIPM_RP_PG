@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de producción</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f7fa; margin: 0; padding: 0; }
+    .container { max-width: 420px; margin: 40px auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(25, 118, 210, 0.10); padding: 24px 18px; }
+    h2 { text-align: center; color: #1976d2; font-size: 1.2em; margin-bottom: 18px; }
+    .menu { display: flex; justify-content: space-between; margin-bottom: 18px; }
+    .menu button { flex: 1; padding: 10px 0; margin: 0 4px; background: #e3f0ff; color: #1976d2; border: none; border-radius: 7px 7px 0 0; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .menu button.active { background: #1976d2; color: #fff; }
+    .form-section { display: none; }
+    .form-section.active { display: block; }
+    form label { display: block; margin-top: 14px; color: #22304a; font-weight: 500; }
+    input, select { width: 100%; box-sizing: border-box; padding: 12px; margin-top: 4px; font-size: 1em; border: 1.2px solid #b0b8c9; border-radius: 7px; background: #f4f7fa; }
+    .horario-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 4px;
+    }
+    .horario-row input[type="time"] {
+      flex: 1 1 0;
+      min-width: 0;
+      max-width: 204px;
+    }
+    #idlote-container {
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #idlote-container label {
+      font-weight: 600;
+      color: #169721; /* color del ID de lote */
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+    #idlote {
+      flex: 1;
+      background: #ffffff;
+      width: 100;
+      display: inline-block;
+      border: 1.5px solid #00000000;
+      box-sizing: border-box;
+      text-align: left;
+      color: #169721; /* color del ID de lote */
+    }
+
+    /* Ocultar las columnas de Nombre y Área */
+    th:nth-child(2), td:nth-child(2),
+    th:nth-child(3), td:nth-child(3) {
+      display: none;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .button-row button {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="modal-cilindros" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(33,40,60,0.18);z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:#fff;padding:28px 22px 18px 22px;border-radius:12px;box-shadow:0 2px 16px rgba(25,118,210,0.13);max-width:320px;width:90vw;text-align:center;">
+      <div id="modal-cilindros-titulo" style="font-weight:600;color:#1976d2;margin-bottom:12px;font-size:1.08em;">Validar cilindros</div>
+      <input id="modal-cilindros-input" type="number" inputmode="numeric" pattern="[0-9]*" min="0" style="width:100%;padding:10px;font-size:1.1em;margin-bottom:14px;border:1.2px solid #b0b8c9;border-radius:7px;" placeholder="Cantidad de cilindros">
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button id="modal-cilindros-ok" style="background:#1976d2;color:#fff;border:none;border-radius:7px;padding:8px 18px;font-size:1em;font-weight:600;cursor:pointer;">Aceptar</button>
+        <button id="modal-cilindros-cancel" style="background:#e3f0ff;color:#1976d2;border:1.5px solid #1976d2;border-radius:7px;padding:8px 18px;font-size:1em;font-weight:600;cursor:pointer;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <h2 style="display:flex;align-items:center;justify-content:center;gap:8px;">
+      <span style="font-size:1.3em;">&#x1F4DD;</span>
+      Registro de producción
+    </h2>
+    <div class="menu">
+      <button type="button" class="active" id="btnLlenador">Datos del llenador</button>
+      <button type="button" id="btnLote">Datos del lote</button>
+      <button type="button" id="btnProducto">Datos del producto</button>
+    </div>
+    <div id="sectionLlenador" class="form-section active">
+      <form>
+        <label>Nombre:
+          <input type="text" name="nombre" required list="nombres-lista">
+          <datalist id="nombres-lista">
+            <option value="Christian Molina">
+            <option value="Daniel Hernández">
+            <option value="David Oliva">
+            <option value="Edgar López">
+            <option value="Edson Gonzalez">
+            <option value="Fernando Moreno">
+            <option value="Francisco López">
+            <option value="Francisco Mendoza">
+            <option value="Gabriel Martinez">
+            <option value="Heriberto Hernández">
+            <option value="Humberto Huerta">
+            <option value="Jorge Barrón">
+            <option value="Jorge Tirado">
+            <option value="Jose Jasso">
+            <option value="Jose Zapata">
+            <option value="Luis López">
+            <option value="Misael Avilés">
+            <option value="Misael Palafox">
+            <option value="Orlando Ibarra">
+            <option value="Rodolfo Villarreal">
+            <option value="Samai Acosta">
+          </datalist>
+        </label>
+        <label>Turno:
+          <select name="turno" required>
+            <option value="">Selecciona</option>
+            <option value="Mañana">Mañana</option>
+            <option value="Tarde">Tarde</option>
+            <option value="Noche">Noche</option>
+          </select>
+        </label>
+        <label>Área:
+          <select name="area" required>
+            <option value="">Selecciona</option>
+            <option value="151 Oxígeno medicinal">151 Oxígeno medicinal</option>
+            <option value="211 Oxígeno industrial">211 Oxígeno industrial</option>
+            <option value="212 Nitrógeno">212 Nitrógeno</option>
+            <option value="213 Bióxido de carbono">213 Bióxido de carbono</option>
+            <option value="214 Argón">214 Argón</option>
+            <option value="216 Hidrógeno">216 Hidrógeno</option>
+            <option value="217 Helio">217 Helio</option>
+            <option value="517 Helio líquido">517 Helio líquido</option>
+            <option value="Mezclas">Mezclas</option>
+          </select>
+        </label>
+      </form>
+    </div>
+    <div id="sectionLote" class="form-section">
+      <form>
+        <label>Número de Manifold:</label>
+          <select name="manifold" required>
+            <option value="">Selecciona</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+          </select>
+        </label>
+        <label>Número de Línea:</label>
+          <select name="linea" required>
+            <option value="">Selecciona</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+          </select>
+        </label>
+        <label>Horario inicial y final:</label>
+        <div class="horario-row">
+          <input type="time" name="horainicial" required>
+          <input type="time" name="horafinal" required>
+        </div>
+      </form>
+    </div>
+    <div id="sectionProducto" class="form-section">
+      <form>
+        <label>Código:</label>
+          <input type="number" name="codigo" inputmode="numeric" pattern="[0-9]*">
+        </label>
+        <label>Producto:</label>
+          <input type="text" name="producto" readonly>
+        </label>
+        <label>Cilindros:</label>
+          <input type="number" name="cilindros" min="1" inputmode="numeric" pattern="[0-9]*">
+        </label>
+      </form>
+    </div>
+    <div id="idlote-container">
+      <label>Id lote:</label>
+        <input type="text" id="idlote" name="idlote" readonly required>
+      </label>
+    </div>
+    <div class="button-row">
+      <button type="button" id="registrarBtn" style="background:#1976d2;color:#fff;border:none;border-radius:7px;padding:12px 0;font-size:1em;font-weight:600;cursor:pointer;">Registrar lote</button>
+      <button type="button" id="nuevoRegistroBtn" style="background:#e3f0ff;color:#1976d2;border:1.5px solid #1976d2;border-radius:7px;padding:10px 0;font-size:1em;font-weight:600;cursor:pointer;">Limpiar registro</button>
+    </div>
+    <button type="button" id="verTodosBtn" style="display:none;width:100%;margin-top:10px;background:#fff;color:#1976d2;border:1.5px solid #1976d2;border-radius:7px;padding:10px 0;font-size:1em;font-weight:600;cursor:pointer;">Ver todos los lotes (modo supervisor)</button>
+    <button type="button" id="modoSupervisorBtn" style="width:100%;margin-top:10px;background:#fff;color:#1976d2;border:1.5px solid #1976d2;border-radius:7px;padding:10px 0;font-size:1em;font-weight:600;cursor:pointer;">Modo supervisor</button>
+    <button type="button" id="modoUsuarioBtn" style="width:100%;margin-top:10px;background:#fff;color:#1976d2;border:1.5px solid #1976d2;border-radius:7px;padding:10px 0;font-size:1em;font-weight:600;cursor:pointer;">Modo usuario</button>
+    <button type="button" id="verTodosModoUsuarioBtn" style="display:none;width:100%;margin-top:10px;background:#fff;color:#1976d2;border:1.5px solid #1976d2;border-radius:7px;padding:10px 0;font-size:1em;font-weight:600;cursor:pointer;">Ver todos los lotes (modo usuario)</button>
+    <div id="todos" style="margin-top:14px;"></div>
+    <div id="resumen" style="margin-top:18px;"></div>
+  
+  </div>
+  <div id="access-module" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center;">
+  <div style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,0.2);width:300px;text-align:center;">
+    <h3 style="margin-bottom:15px;color:#1976d2;">Acceso de Supervisores</h3>
+    <label for="supervisor-key" style="display:block;margin-bottom:10px;color:#333;font-weight:500;">Ingrese su clave:</label>
+    <input id="supervisor-key" type="password" inputmode="numeric" pattern="[0-9]*" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:5px;margin-bottom:15px;" placeholder="Clave de acceso">
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button id="access-validate" style="background:#1976d2;color:#fff;border:none;border-radius:5px;padding:10px 20px;font-weight:600;cursor:pointer;">Validar</button>
+      <button id="access-cancel" style="background:#e3f0ff;color:#1976d2;border:1px solid #1976d2;border-radius:5px;padding:10px 20px;font-weight:600;cursor:pointer;">Cancelar</button>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const accessModule = document.getElementById('access-module');
+    const accessKeyInput = document.getElementById('supervisor-key');
+    const accessValidateBtn = document.getElementById('access-validate');
+    const accessCancelBtn = document.getElementById('access-cancel');
+
+    const supervisorKeys = {
+      "Fernado Moreno": '4098',
+      "Christian Molina": '11680',
+      "Humberto Huerta": '11907',
+      "Jose Zapata": '11014'
+    };
+
+    function openAccessModule() {
+      accessModule.style.display = 'flex';
+      accessKeyInput.value = '';
+      accessKeyInput.focus();
+    }
+
+    function closeAccessModule() {
+      accessModule.style.display = 'none';
+    }
+
+    accessValidateBtn.addEventListener('click', function() {
+      const enteredKey = accessKeyInput.value.trim();
+      if (Object.values(supervisorKeys).includes(enteredKey)) {
+        closeAccessModule();
+
+        // Hide 'Modo supervisor' button
+        const modoSupervisorBtn = document.getElementById('modoSupervisorBtn');
+        if (modoSupervisorBtn) {
+          modoSupervisorBtn.style.display = 'none';
+        }
+
+        // Show 'Ver todos los lotes' button
+        const verTodosBtn = document.getElementById('verTodosBtn');
+        if (verTodosBtn) {
+          verTodosBtn.style.display = 'block';
+        }
+      } else {
+        alert('Clave incorrecta. Intente nuevamente.');
+        accessKeyInput.focus();
+      }
+    });
+
+    accessCancelBtn.addEventListener('click', closeAccessModule);
+
+    // Ejemplo: Abrir el módulo de acceso al cargar la página (puede ajustarse según necesidades)
+    // openAccessModule();
+  });
+</script>
+  <script>
+    // =============================
+    // Generación automática de Id lote
+    // =============================
+    function actualizarIdLote() {
+  // Obtener valores de los campos relevantes
+  const codigo = document.querySelector('input[name="codigo"]')?.value || '';
+  const turno = document.querySelector('select[name="turno"]')?.value || '';
+  const manifold = document.querySelector('select[name="manifold"]')?.value || '';
+  const linea = document.querySelector('select[name="linea"]')?.value || '';
+  // Fecha actual
+  const now = new Date();
+  const year = String(now.getFullYear()).slice(-2);
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  // Código de turno a 1 dígito
+  let turnoCode = '0';
+  if (turno === 'Mañana') turnoCode = '1';
+  else if (turno === 'Tarde') turnoCode = '2';
+  else if (turno === 'Noche') turnoCode = '3';
+  // Manifold y línea a dos dígitos
+  const manifoldCode = manifold ? String(manifold).padStart(2, '0') : '00';
+  const lineaCode = linea ? String(linea).padStart(2, '0') : '00';
+  // Formato final: 425-[codigo]-[año][mes][día]-[manifoldCode]-[turnoCode]-[lineaCode]
+  const idlote = `425-${codigo}-${year}${month}${day}-${manifoldCode}-${turnoCode}-${lineaCode}`;
+  document.getElementById('idlote').value = idlote;
+}
+
+// Asignar eventos a los campos relevantes para actualizar Id lote
+document.querySelector('input[name="codigo"]').addEventListener('input', actualizarIdLote);
+document.querySelector('select[name="turno"]').addEventListener('change', actualizarIdLote);
+document.querySelector('select[name="manifold"]').addEventListener('change', actualizarIdLote);
+document.querySelector('select[name="linea"]').addEventListener('change', actualizarIdLote);
+// Inicializar al cargar
+actualizarIdLote();
+
+// =============================
+// Guardar los lotes pendientes en memoria para saber si el idlote es de un lote pendiente
+// =============================
+let lotesPendientesIds = [];
+
+// =============================
+    // Lógica para "Nuevo registro"
+    // =============================
+    document.getElementById('nuevoRegistroBtn').addEventListener('click', function() {
+      // --- MEJORA: Limpiar y desbloquear todos los campos, mostrar sección llenador, ocultar tablas y resumen, enfocar en nombre ---
+
+      // 1. Limpiar todos los campos del formulario
+      const camposTodos = [
+        'input[name="nombre"]',
+        'select[name="turno"]',
+        'select[name="area"]',
+        'select[name="manifold"]',
+        'select[name="linea"]',
+        'input[name="horainicial"]',
+        'input[name="horafinal"]',
+        'input[name="codigo"]',
+        'input[name="producto"]',
+        'input[name="cilindros"]'
+      ];
+      camposTodos.forEach(sel => {
+        const el = document.querySelector(sel);
+        if (el) {
+          if (el.tagName === 'SELECT') el.selectedIndex = 0;
+          else el.value = '';
+        }
+      });
+
+      // 2. Desbloquear todos los campos (por si estaban bloqueados tras ver un lote)
+      const desbloquear = [
+        { selector: 'input[name="nombre"]', prop: 'readOnly' },
+        { selector: 'select[name="turno"]', prop: 'disabled' },
+        { selector: 'select[name="area"]', prop: 'disabled' },
+        { selector: 'select[name="manifold"]', prop: 'disabled' },
+        { selector: 'select[name="linea"]', prop: 'disabled' },
+        { selector: 'input[name="horainicial"]', prop: 'readOnly' },
+        { selector: 'input[name="horafinal"]', prop: 'readOnly' },
+        { selector: 'input[name="codigo"]', prop: 'readOnly' },
+        { selector: 'input[name="producto"]', prop: 'readOnly' },
+        { selector: 'input[name="cilindros"]', prop: 'readOnly' }
+      ];
+      desbloquear.forEach(c => {
+        const el = document.querySelector(c.selector);
+        if (el) {
+          if (c.prop === 'readOnly') el.readOnly = false;
+          if (c.prop === 'disabled') el.disabled = false;
+        }
+      });
+
+      // 3. Reiniciar Id lote (actualizar según lógica actual)
+      const idloteInput = document.getElementById('idlote');
+      if (idloteInput) {
+        idloteInput.readOnly = true;
+        if (typeof actualizarIdLote === 'function') actualizarIdLote();
+      }
+
+      // 4. Ocultar resumen
+      document.getElementById('resumen').innerHTML = '';
+
+      // 5. Ocultar/reiniciar tabla de lotes
+      document.getElementById('todos').innerHTML = '';
+
+      // 6. Mostrar sección Datos del llenador y ocultar las otras
+      const sectionLlenador = document.getElementById('sectionLlenador');
+      const sectionLote = document.getElementById('sectionLote');
+      const sectionProducto = document.getElementById('sectionProducto');
+      if (sectionLlenador && sectionLote && sectionProducto) {
+        sectionLlenador.classList.add('active');
+        sectionLote.classList.remove('active');
+        sectionProducto.classList.remove('active');
+      }
+
+      // 7. Actualizar menú visual para marcar llenador como activo
+      const btnLlenador = document.getElementById('btnLlenador');
+      const btnLote = document.getElementById('btnLote');
+      const btnProducto = document.getElementById('btnProducto');
+      if (btnLlenador && btnLote && btnProducto) {
+        btnLlenador.classList.add('active');
+        btnLote.classList.remove('active');
+        btnProducto.classList.remove('active');
+      }
+
+      // 8. Poner el foco en el campo nombre
+      // const nombre = document.querySelector('input[name="nombre"]');
+      // if (nombre) nombre.focus();
+    });
+  
+    // =============================
+    // Registrar lote y mostrar resumen
+    // =============================
+  
+    document.getElementById('registrarBtn').addEventListener('click', function() {
+  // Obtener valores de todos los campos en el orden solicitado
+  const idlote = document.getElementById('idlote').value;
+  const nombre = document.querySelector('input[name="nombre"]').value;
+  const turno = document.querySelector('select[name="turno"]').value;
+  const area = document.querySelector('select[name="area"]').value;
+  const manifold = document.querySelector('select[name="manifold"]').value;
+  const linea = document.querySelector('select[name="linea"]').value;
+  const codigo = document.querySelector('input[name="codigo"]').value;
+  const producto = document.querySelector('input[name="producto"]').value;
+  const cilindros = document.querySelector('input[name="cilindros"]').value;
+  function toTimeValue(val) {
+    if (!val) return '';
+    if (/^\d{2}:\d{2}$/.test(val)) return val;
+    if (/^\d{2}:\d{2}:\d{2}$/.test(val)) return val.slice(0,5);
+    if (/^\d{4}$/.test(val)) return val.slice(0,2)+":"+val.slice(2,4);
+    const ampmMatch = val.match(/^([0-9]{1,2}):(\d{2})\s*([ap]\.\?\s*m\.?)/i);
+    if (ampmMatch) {
+      let hour = parseInt(ampmMatch[1], 10);
+      const min = ampmMatch[2];
+      const ampm = ampmMatch[3].toLowerCase();
+      if (ampm.includes('p') && hour < 12) hour += 12;
+      if (ampm.includes('a') && hour === 12) hour = 0;
+      return (hour < 10 ? '0' : '') + hour + ':' + min;
+    }
+    return '';
+  }
+  const horainicial = toTimeValue(document.querySelector('input[name="horainicial"]').value);
+  const horafinal = toTimeValue(document.querySelector('input[name="horafinal"]').value);
+
+  // Validación: Todos los campos son obligatorios, incluyendo horas.
+  if (
+    !idlote ||
+    !nombre ||
+    !turno ||
+    !area ||
+    !manifold ||
+    !linea ||
+    !codigo ||
+    !producto ||
+    !cilindros ||
+    !horainicial ||
+    !horafinal
+  ) {
+    document.getElementById('resumen').innerHTML = '<span style="color:#d32f2f;">Por favor, completa todos los campos obligatorios antes de registrar.</span>';
+    return;
+  }
+
+  // Validar Id lote contra Google Sheets antes de enviar
+  fetch('https://script.google.com/macros/s/AKfycbxzK-xJaggLLaNy7i2g5g--iTX-LX9qLb2WMg8uUFIDqVVzqAtYtL2Ag8OBSQ98N6AM/exec')
+    .then(resp => resp.json())
+    .then(function(lotes) {
+      // Si la respuesta es un array de objetos, extraer los Id lote
+      let idLotesArray = [];
+      if (Array.isArray(lotes) && lotes.length > 0 && typeof lotes[0] === 'object') {
+        idLotesArray = lotes.map(l => l['Id lote']);
+      } else if (Array.isArray(lotes)) {
+        idLotesArray = lotes;
+      }
+      if (idLotesArray.includes(idlote)) {
+        document.getElementById('resumen').innerHTML = "<div style='background:#fff3e0;border:1.5px solid #ffa726;border-radius:9px;box-shadow:0 2px 8px rgba(255,167,38,0.08);padding:14px 18px;color:#f57c00;font-size:1.08em;font-weight:500;text-align:left;margin-top:10px;'>Id lote duplicado favor de validar.</div>";
+        return;
+      }
+
+      // Mostrar resumen solo si el Id lote no está duplicado
+      const resumen = `<b>Resumen del registro:</b><br>` +
+        `Id lote: ${idlote}<br>` +
+        `Nombre: ${nombre}<br>` +
+        `Turno: ${turno}<br>` +
+        `Área: ${area}<br>` +
+        `Número Manifold: ${manifold}<br>` +
+        `Número Línea: ${linea}<br>` +
+        `Hora inicial: ${horainicial}<br>` +
+        `Hora final: ${horafinal}<br>` +
+        `Código: ${codigo}<br>` +
+        `Producto: ${producto}<br>` +
+        `Cilindros: ${cilindros}`;
+      document.getElementById('resumen').innerHTML = `<div style='background:#f5faff;border:1.5px solid #b6c6e3;border-radius:9px;box-shadow:0 2px 8px rgba(25,118,210,0.06);padding:14px 18px;color:#1976d2;font-size:1.08em;font-weight:500;text-align:left;'>${resumen}</div>` +
+        `<div style='margin-top:14px;display:flex;gap:10px;justify-content:center;'>` +
+        `<button id='confirmarEnvioBtn' style='background:#1976d2;color:#fff;border:none;border-radius:7px;padding:10px 22px;font-size:1em;font-weight:600;cursor:pointer;'>Confirmar y enviar</button>` +
+        `<button id='editarEnvioBtn' style='background:#fff;color:#1976d2;border:1.5px solid #1976d2;border-radius:7px;padding:10px 22px;font-size:1em;font-weight:600;cursor:pointer;'>Editar</button>` +
+        `</div>`;
+
+      // Botón Editar: regresa a la sección de llenador y permite editar
+      setTimeout(function() {
+        document.getElementById('editarEnvioBtn').onclick = function() {
+          // Limpiar el área de resumen para ocultar el resumen y los botones
+          document.getElementById('resumen').innerHTML = '';
+          // Mostrar sección Datos del llenador y ocultar las otras
+          const sectionLlenador = document.getElementById('sectionLlenador');
+          const sectionLote = document.getElementById('sectionLote');
+          const sectionProducto = document.getElementById('sectionProducto');
+          if (sectionLlenador && sectionLote && sectionProducto) {
+            sectionLlenador.classList.add('active');
+            sectionLote.classList.remove('active');
+            sectionProducto.classList.remove('active');
+          }
+          // Actualizar menú visual
+          const btnLlenador = document.getElementById('btnLlenador');
+          const btnLote = document.getElementById('btnLote');
+          const btnProducto = document.getElementById('btnProducto');
+          if (btnLlenador && btnLote && btnProducto) {
+            btnLlenador.classList.add('active');
+            btnLote.classList.remove('active');
+            btnProducto.classList.remove('active');
+          }
+          // Poner el foco en el campo nombre
+          const nombre = document.querySelector('input[name="nombre"]');
+          if (nombre) nombre.focus();
+        };
+        // Botón Confirmar y enviar: envía a Sheets
+        document.getElementById('confirmarEnvioBtn').onclick = function() {
+          // Limpiar los campos de Datos de lote y Datos del producto
+          document.querySelector('select[name="manifold"]').selectedIndex = 0;
+          document.querySelector('select[name="linea"]').selectedIndex = 0;
+          document.querySelector('input[name="horainicial"]').value = '';
+          document.querySelector('input[name="horafinal"]').value = '';
+          document.querySelector('input[name="codigo"]').value = '';
+          document.querySelector('input[name="producto"]').value = '';
+          document.querySelector('input[name="cilindros"]').value = '';
+
+          // Mostrar sección Datos del lote y ocultar las otras
+          const sectionLote = document.getElementById('sectionLote');
+          const sectionLlenador = document.getElementById('sectionLlenador');
+          const sectionProducto = document.getElementById('sectionProducto');
+          if (sectionLote && sectionLlenador && sectionProducto) {
+            sectionLote.classList.add('active');
+            sectionLlenador.classList.remove('active');
+            sectionProducto.classList.remove('active');
+          }
+          // Actualizar menú visual
+          const btnLote = document.getElementById('btnLote');
+          const btnLlenador = document.getElementById('btnLlenador');
+          const btnProducto = document.getElementById('btnProducto');
+          if (btnLote && btnLlenador && btnProducto) {
+            btnLote.classList.add('active');
+            btnLlenador.classList.remove('active');
+            btnProducto.classList.remove('active');
+          }
+          
+          // Enviar datos a Google Sheets vía Apps Script
+          const data = {
+            idlote,
+            nombre,
+            turno,
+            area,
+            manifold,
+            linea,
+            horainicial,
+            horafinal,
+            codigo,
+            producto,
+            cilindros
+          };
+          fetch('https://script.google.com/macros/s/AKfycbxzK-xJaggLLaNy7i2g5g--iTX-LX9qLb2WMg8uUFIDqVVzqAtYtL2Ag8OBSQ98N6AM/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          })
+          .then(function() {
+            // Mostrar mensaje de éxito tras confirmar
+            document.getElementById('resumen').innerHTML = `<div style='background:#e8f5e9;border:1.5px solid #43a047;border-radius:9px;box-shadow:0 2px 8px rgba(67,160,71,0.08);padding:14px 18px;color:#388e3c;font-size:1.08em;font-weight:500;text-align:left;'>✅ Registro completado. Puedes ingresar un nuevo lote.</div>`;
+          })
+          .catch(function() {
+            document.getElementById('resumen').innerHTML += `<div style='background:#ffebee;border:1.5px solid #d32f2f;border-radius:9px;box-shadow:0 2px 8px rgba(211,47,47,0.08);padding:14px 18px;color:#c62828;font-size:1.08em;font-weight:500;text-align:left;margin-top:10px;'>❌ No se pudo registrar el lote. Intenta nuevamente.</div>`;
+          });
+        };
+      }, 0);
+    })
+    .catch(() => {
+      document.getElementById('resumen').innerHTML += `<div style='background:#ffebee;border:1.5px solid #d32f2f;border-radius:9px;box-shadow:0 2px 8px rgba(211,47,47,0.08);padding:14px 18px;color:#c62828;font-size:1.08em;font-weight:500;text-align:left;margin-top:10px;'>❌ No se pudo validar el Id lote en Google Sheets.</div>`;
+    });
+});
+    // =============================
+    // Mostrar tabla de todos los lotes (independientemente del estado)
+    // =============================
+    document.getElementById('verTodosBtn').addEventListener('click', function() {
+      const todosDiv = document.getElementById('todos');
+      todosDiv.innerHTML = '<span style="color:#1976d2;">Cargando todos los lotes...</span>';
+      fetch('https://script.google.com/macros/s/AKfycbxzK-xJaggLLaNy7i2g5g--iTX-LX9qLb2WMg8uUFIDqVVzqAtYtL2Ag8OBSQ98N6AM/exec')
+        .then(resp => resp.json())
+        .then(lotes => {
+          if (!Array.isArray(lotes) || lotes.length === 0) {
+            todosDiv.innerHTML = '<span style="color:#d32f2f;">No hay lotes registrados.</span>';
+            return;
+          }
+          let tabla = `<table style='width:100%;border-collapse:collapse;font-size:0.98em;'>`;
+          tabla += `<tr style='background:#e3f0ff;color:#1976d2;'><th style='border:1px solid #b6c6e3;padding:4px;'>Id lote</th><th style='border:1px solid #b6c6e3;padding:4px;'>Nombre</th><th style='border:1px solid #b6c6e3;padding:4px;'>Área</th><th style='border:1px solid #b6c6e3;padding:4px;'>Estado</th><th style='border:1px solid #b6c6e3;padding:4px;'>Acción</th></tr>`;
+          lotes.forEach((lote, idx) => {
+            const idLoteValue = lote['Id lote'] || '';
+            const nombreValue = lote['Nombre'] || '';
+            const areaValue = lote['Área'] || '';
+            const estadoValue = (lote['Estado'] || '').toLowerCase();
+            let color = '#1976d2';
+            let bg = '#f5faff';
+
+            if (estadoValue === 'rechazado') { color = '#d32f2f'; bg = '#ffebee'; }
+            else if (estadoValue === 'validado') { color = '#388e3c'; bg = '#e8f5e9'; }
+
+            tabla += `<tr>` +
+              `<td style='border:1px solid #b6c6e3;padding:4px;'>${idLoteValue}</td>` +
+              `<td style='border:1px solid #b6c6e3;padding:4px;'>${nombreValue}</td>` +
+              `<td style='border:1px solid #b6c6e3;padding:4px;'>${areaValue}</td>` +
+              `<td style='border:1px solid #b6c6e3;padding:4px;color:${color};background:${bg};font-weight:600;'>${lote['Estado'] || ''}</td>` +
+              `<td style='border:1px solid #b6c6e3;padding:4px;'>
+                <button type='button' class='ver-resumen-todos-btn' data-idx='${idx}' title='Ver resumen' style='background:none;border:none;cursor:pointer;font-size:1.2em;color:${color};'>
+                  <span style='font-size:1.3em;'>&#x1F50D;</span>
+                </button>
+              </td>` +
+            `</tr>`;
+          });
+          tabla += `</table>`;
+          todosDiv.innerHTML = tabla;
+
+          // Asignar evento a los botones 'Ver resumen' de todos los lotes
+          document.querySelectorAll('.ver-resumen-todos-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+              const lote = lotes[parseInt(this.getAttribute('data-idx'))];
+              if (!lote) return;
+              const estado = lote['Estado'] || '';
+              mostrarResumenLoteConBotones(lote, estado);
+            });
+          });
+        })
+        .catch(() => {
+          todosDiv.innerHTML = '<span style="color:#d32f2f;">No se pudo obtener la lista de lotes.</span>';
+        });
+    });
+    // =============================
+    // Lógica para selección de menú
+    // =============================
+    document.getElementById('btnLlenador').addEventListener('click', function() {
+      document.getElementById('sectionLlenador').classList.add('active');
+      document.getElementById('sectionLote').classList.remove('active');
+      document.getElementById('sectionProducto').classList.remove('active');
+      this.classList.add('active');
+      document.getElementById('btnLote').classList.remove('active');
+      document.getElementById('btnProducto').classList.remove('active');
+    });
+
+    document.getElementById('btnLote').addEventListener('click', function() {
+      document.getElementById('sectionLote').classList.add('active');
+      document.getElementById('sectionLlenador').classList.remove('active');
+      document.getElementById('sectionProducto').classList.remove('active');
+      this.classList.add('active');
+      document.getElementById('btnLlenador').classList.remove('active');
+      document.getElementById('btnProducto').classList.remove('active');
+    });
+
+    document.getElementById('btnProducto').addEventListener('click', function() {
+      document.getElementById('sectionProducto').classList.add('active');
+      document.getElementById('sectionLlenador').classList.remove('active');
+      document.getElementById('sectionLote').classList.remove('active');
+      this.classList.add('active');
+      document.getElementById('btnLlenador').classList.remove('active');
+      document.getElementById('btnLote').classList.remove('active');
+    });
+
+    // =============================
+    // Función centralizada para mostrar resúmenes con lógica de botones
+    // =============================
+    function mostrarResumenLoteConBotones(lote, estado) {
+  const coloresEstado = {
+    validado: { color: '#388e3c', fondo: '#e8f5e9' },
+    rechazado: { color: '#d32f2f', fondo: '#ffebee' },
+    pendiente: { color: '#1976d2', fondo: '#f5faff' },
+  };
+
+  const estilos = coloresEstado[estado.toLowerCase()] || { color: '#1976d2', fondo: '#f5faff' };
+
+  const resumen = `<b>Resumen del registro:</b><br>` +
+    `Id lote: ${lote['Id lote'] || ''}<br>` +
+    `Nombre: ${lote['Nombre'] || ''}<br>` +
+    `Turno: ${lote['Turno'] || ''}<br>` +
+    `Área: ${lote['Área'] || ''}<br>` +
+    `Número Manifold: ${lote['Manifold'] || ''}<br>` +
+    `Número Línea: ${lote['Línea'] || ''}<br>` +
+    `Hora inicial: ${lote['Hora inicial'] || ''}<br>` +
+    `Hora final: ${lote['Hora final'] || ''}<br>` +
+    `Código: ${lote['Código'] || ''}<br>` +
+    `Producto: ${lote['Producto'] || ''}<br>` +
+    `Cilindros: ${lote['Cilindros'] || ''}`;
+
+  let resumenHtml = `<div style='background:${estilos.fondo};border:1.5px solid ${estilos.color};border-radius:9px;box-shadow:0 2px 8px rgba(25,118,210,0.06);padding:14px 18px;color:${estilos.color};font-size:1.08em;font-weight:500;text-align:left;'>${resumen}`;
+  // Botones adicionales según el estado
+  if (estado.toLowerCase() === 'pendiente') {
+    resumenHtml += `<div style='margin-top:14px;display:flex;gap:10px;justify-content:center;'>` +
+      `<button id='validarDesdeResumenBtn' style='background:#ff9800;color:#fff;border:none;border-radius:7px;padding:10px 22px;font-size:1em;font-weight:600;cursor:pointer;'>Validar lote</button>` +
+    `</div>`;
+  } else if (estado.toLowerCase() === 'rechazado') {
+    resumenHtml += `<div style='margin-top:14px;display:flex;gap:10px;justify-content:center;'>` +
+      `<button id='modificarCilindrosDesdeResumenBtn' style='background:#1976d2;color:#fff;border:none;border-radius:7px;padding:10px 22px;font-size:1em;font-weight:600;cursor:pointer;'>Ingresar cantidad correcta</button>` +
+    `</div>`;
+  }
+
+  resumenHtml += `</div>`;
+  document.getElementById('resumen').innerHTML = resumenHtml;
+
+  // Eventos para los botones
+  if (estado.toLowerCase() === 'pendiente') {
+    setTimeout(() => {
+      const btnValidar = document.getElementById('validarDesdeResumenBtn');
+      if (btnValidar) {
+        btnValidar.onclick = function() {
+          const modal = document.getElementById('modal-cilindros');
+          const input = document.getElementById('modal-cilindros-input');
+          const titulo = document.getElementById('modal-cilindros-titulo');
+          modal.style.display = 'flex';
+          input.value = '';
+          input.focus();
+          titulo.textContent = `Valide la cantidad de cilindros del lote: ${lote['Id lote']}`;
+
+          function cerrarModal() {
+            modal.style.display = 'none';
+            input.value = '';
+            document.getElementById('modal-cilindros-ok').onclick = null;
+            document.getElementById('modal-cilindros-cancel').onclick = null;
+          }
+
+          document.getElementById('modal-cilindros-cancel').onclick = cerrarModal;
+          document.getElementById('modal-cilindros-ok').onclick = async function() {
+            const cilindrosIngresados = input.value.trim();
+            if (!/^[0-9]+$/.test(cilindrosIngresados)) {
+              alert('Por favor, ingrese un número válido.');
+              input.focus();
+              return;
+            }
+            const valIngresado = parseInt(cilindrosIngresados, 10);
+            const valRegistrado = parseInt(lote['Cilindros'], 10);
+            const estado = valIngresado === valRegistrado ? 'Validado' : 'Rechazado';
+
+            // Actualizar en Google Sheets
+            const data = {
+                idlote: lote['Id lote'],
+                estadoValidacion: estado
+            };
+
+            try {
+                await fetch('https://script.google.com/macros/s/AKfycbxzK-xJaggLLaNy7i2g5g--iTX-LX9qLb2WMg8uUFIDqVVzqAtYtL2Ag8OBSQ98N6AM/exec', {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                                if (estado.toLowerCase() === 'rechazado') {
+                document.getElementById('resumen').innerHTML = `
+                <div style="background:#ffebee;border:1.5px solid #d32f2f;border-radius:9px;box-shadow:0 2px 8px rgba(211,47,47,0.08);padding:14px 18px;color:#c62828;font-size:1.08em;font-weight:500;text-align:left;">
+                ❌ El estado del lote ha sido actualizado a <b>${estado}</b>.
+                </div>`;
+                } else {
+                document.getElementById('resumen').innerHTML = `
+                <div style="background:#e8f5e9;border:1.5px solid #43a047;border-radius:9px;box-shadow:0 2px 8px rgba(67,160,71,0.08);padding:14px 18px;color:#388e3c;font-size:1.08em;font-weight:500;text-align:left;">
+                ✅ El estado del lote ha sido actualizado a <b>${estado}</b>.
+                </div>`;
+            }
+
+              } catch (error) {
+                console.error('Error al actualizar Google Sheets:', error);
+                alert('No se pudo actualizar el estado en Google Sheets.');
+            }
+
+            cerrarModal();
+          };
+        };
+      }
+    }, 0);
+  } else if (estado.toLowerCase() === 'rechazado') {
+    setTimeout(() => {
+        const btnModificar = document.getElementById('modificarCilindrosDesdeResumenBtn');
+        if (btnModificar) {
+            btnModificar.onclick = function() {
+                const modal = document.getElementById('modal-cilindros');
+                const input = document.getElementById('modal-cilindros-input');
+                const titulo = document.getElementById('modal-cilindros-titulo');
+                modal.style.display = 'flex';
+                input.value = '';
+                input.focus();
+                titulo.textContent = `Ingrese la cantidad correcta de cilindros para el lote ${lote['Id lote']}`;
+
+                function cerrarModal() {
+                    modal.style.display = 'none';
+                    input.value = '';
+                    document.getElementById('modal-cilindros-ok').onclick = null;
+                    document.getElementById('modal-cilindros-cancel').onclick = null;
+                }
+
+                document.getElementById('modal-cilindros-cancel').onclick = cerrarModal;
+                document.getElementById('modal-cilindros-ok').onclick = async function() {
+                    const nuevosCilindros = input.value.trim();
+                    if (!/^[0-9]+$/.test(nuevosCilindros)) {
+                        alert('Por favor, ingrese un número válido.');
+                        input.focus();
+                        return;
+                    }
+
+                    const valIngresado = parseInt(nuevosCilindros, 10);
+                    const estado = 'Validado';
+
+                    try {
+                        await fetch('https://script.google.com/macros/s/AKfycbxzK-xJaggLLaNy7i2g5g--iTX-LX9qLb2WMg8uUFIDqVVzqAtYtL2Ag8OBSQ98N6AM/exec', {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ idlote: lote['Id lote'], Cilindros: valIngresado, estadoValidacion: estado })
+                        });
+
+                        document.getElementById('resumen').innerHTML = `<div style='background:#e8f5e9;border:1.5px solid #43a047;border-radius:9px;box-shadow:0 2px 8px rgba(67,160,71,0.08);padding:14px 18px;color:#388e3c;font-size:1.08em;font-weight:500;text-align:left;'>✔️ El lote <b>${lote['Id lote']}</b> ha sido validado y la cantidad de cilindros actualizada a <b>${valIngresado}</b>.</div>`;
+                    } catch (error) {
+                        console.error('Error al actualizar Google Sheets:', error);
+                        alert('No se pudo actualizar el estado en Google Sheets. Intenta nuevamente.');
+                    }
+
+                    cerrarModal();
+                };
+            };
+        }
+    }, 0);
+  }
+}
+  </script>
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Crear contenedor de filtros
+    const filtrosDiv = document.createElement('div');
+    filtrosDiv.id = 'filtros';
+    filtrosDiv.style = 'display: none; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;';
+
+    // Agregar campos de filtro
+    filtrosDiv.innerHTML = `
+      <input id='filtroFecha' type='date' style='flex: 1; padding: 8px; border-radius: 7px; border: 1.2px solid #b0b8c9; font-size: 1em;'>
+      <select id='filtroEstado' style='flex: 1; padding: 8px; border-radius: 7px; border: 1.2px solid #b0b8c9; font-size: 1em;'>
+        <option value=''>Estado</option>
+        <option value='pendiente'>Pendiente</option>
+        <option value='validado'>Validado</option>
+        <option value='rechazado'>Rechazado</option>
+      </select>
+      <input id='busquedaLotes' type='text' placeholder='Buscar...' style='flex: 1; padding: 8px; border-radius: 7px; border: 1.2px solid #b0b8c9; font-size: 1em;'>
+    `;
+
+    // Insertar filtros antes de la tabla
+    const todosDiv = document.getElementById('todos');
+    if (todosDiv) {
+      todosDiv.parentNode.insertBefore(filtrosDiv, todosDiv);
+    }
+
+    // Función para ocultar filtros al cambiar de sección
+    function ocultarFiltrosLotes() {
+      const filtrosDiv = document.getElementById('filtros');
+      if (filtrosDiv) filtrosDiv.style.display = 'none';
+    }
+
+    // Mostrar filtros al ver todos los lotes
+    function mostrarFiltrosLotes() {
+      const filtrosDiv = document.getElementById('filtros');
+      if (filtrosDiv) filtrosDiv.style.display = 'flex';
+    }
+
+    // Asociar ocultar filtros a los botones de cambio de sección
+    document.getElementById('nuevoRegistroBtn').addEventListener('click', ocultarFiltrosLotes);
+
+    // Mostrar filtros al ver todos los lotes
+    document.getElementById('verTodosBtn').addEventListener('click', mostrarFiltrosLotes);
+
+    // =============================
+    // Función de filtros para lotes
+    // =============================
+    function renderTablaLotes() {
+      const texto = document.getElementById('busquedaLotes').value.toLowerCase();
+      const estado = document.getElementById('filtroEstado').value;
+      const fecha = document.getElementById('filtroFecha').value;
+
+      // Ocultar el resumen al aplicar filtros
+      document.getElementById('resumen').innerHTML = '';
+
+      const filas = document.querySelectorAll('#todos table tr');
+      filas.forEach((fila, index) => {
+        if (index === 0) return; // Saltar la cabecera
+
+        const columnas = fila.querySelectorAll('td');
+        const idLote = columnas[0]?.textContent.trim() || ''; // Columna 0 (Id lote)
+        const nombre = columnas[1]?.textContent.toLowerCase().trim() || ''; // Columna 1 (Nombre)
+        const area = columnas[2]?.textContent.toLowerCase().trim() || ''; // Columna 2 (Área)
+        const estadoFila = columnas[3]?.textContent.toLowerCase().trim() || ''; // Columna 3 (Estado)    
+
+        let coincide = true;
+
+        // Filtro por texto (nombre, área,)
+        if (texto) {
+          coincide = (
+            idLote.toLowerCase().includes(texto) ||
+            nombre.includes(texto) ||
+            area.includes(texto)
+          );
+        }
+
+        // Filtro por estado
+        if (estado && coincide) {
+          coincide = estadoFila === estado;
+        }
+
+        // Filtro por fecha (busca en Id lote la fecha)
+        if (fecha && coincide) {
+          const fechaLote = idLote.split('-')[2]; // Extraer YYMMDD del Id lote
+          if (fechaLote && fechaLote.length === 6) {
+            const fechaInput = fecha.replace(/-/g, '').slice(2); // Convertir a YYMMDD
+            coincide = fechaLote === fechaInput;
+          } else {
+            coincide = false;
+          }
+        }
+
+        fila.style.display = coincide ? '' : 'none';
+      });
+    }
+
+    // Asignar eventos a los filtros
+    document.getElementById('filtroFecha').addEventListener('input', renderTablaLotes);
+    document.getElementById('filtroEstado').addEventListener('change', renderTablaLotes);
+    document.getElementById('busquedaLotes').addEventListener('input', renderTablaLotes);
+  });
+</script>
+<script>
+  document.getElementById('modoSupervisorBtn').addEventListener('click', function() {
+    const accessModule = document.getElementById('access-module');
+    const modoUsuarioBtn = document.getElementById('modoUsuarioBtn');
+
+    if (accessModule) {
+      accessModule.style.display = 'flex';
+      const accessKeyInput = document.getElementById('supervisor-key');
+      if (accessKeyInput) {
+        accessKeyInput.value = '';
+        accessKeyInput.focus();
+      }
+
+      // Mostrar el botón 'Modo usuario' al cancelar la validación
+      const accessCancelBtn = document.getElementById('access-cancel');
+      if (accessCancelBtn) {
+        accessCancelBtn.addEventListener('click', function() {
+          if (modoUsuarioBtn) {
+            modoUsuarioBtn.style.display = 'block';
+          }
+        });
+      }
+    }
+  });
+</script>
+<script>
+  document.getElementById('modoUsuarioBtn').addEventListener('click', function() {
+    const modoUsuarioBtn = document.getElementById('modoUsuarioBtn');
+    const verTodosModoUsuarioBtn = document.getElementById('verTodosModoUsuarioBtn');
+    const modoSupervisorBtn = document.getElementById('modoSupervisorBtn');
+
+    if (modoUsuarioBtn) {
+      modoUsuarioBtn.style.display = 'none';
+    }
+
+    if (verTodosModoUsuarioBtn) {
+      verTodosModoUsuarioBtn.style.display = 'block'; // Mostrar el botón 'Ver todos los lotes (modo usuario)'
+    }
+
+    if (modoSupervisorBtn) {
+      modoSupervisorBtn.style.display = 'none'; // Ocultar el botón 'Modo supervisor'
+    }
+  });
+</script>
+<script>
+  document.getElementById('modoSupervisorBtn').addEventListener('click', function() {
+    const modoUsuarioBtn = document.getElementById('modoUsuarioBtn');
+    if (modoUsuarioBtn) {
+      modoUsuarioBtn.style.display = 'none';
+    }
+  });
+</script>
+<script>
+  document.getElementById('verTodosModoUsuarioBtn').addEventListener('click', function() {
+    const todosDiv = document.getElementById('todos');
+    todosDiv.innerHTML = '<span style="color:#1976d2;">Cargando todos los lotes (modo usuario)...</span>';
+
+    fetch('https://script.google.com/macros/s/AKfycbxzK-xJaggLLaNy7i2g5g--iTX-LX9qLb2WMg8uUFIDqVVzqAtYtL2Ag8OBSQ98N6AM/exec')
+      .then(resp => resp.json())
+      .then(lotes => {
+        if (!Array.isArray(lotes) || lotes.length === 0) {
+          todosDiv.innerHTML = '<span style="color:#d32f2f;">No hay lotes registrados (modo usuario).</span>';
+          return;
+        }
+
+        // Crear contenedor de filtros
+        const filtrosDiv = document.createElement('div');
+        filtrosDiv.id = 'filtrosModoUsuario';
+        filtrosDiv.style = 'display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;';
+
+        // Agregar campos de filtro
+        filtrosDiv.innerHTML = `
+          <input id='filtroFechaModoUsuario' type='date' style='flex: 1; padding: 8px; border-radius: 7px; border: 1.2px solid #b0b8c9; font-size: 1em;'>
+          <select id='filtroEstadoModoUsuario' style='flex: 1; padding: 8px; border-radius: 7px; border: 1.2px solid #b0b8c9; font-size: 1em;'>
+            <option value=''>Estado</option>
+            <option value='pendiente'>Pendiente</option>
+            <option value='validado'>Validado</option>
+            <option value='rechazado'>Rechazado</option>
+          </select>
+          <input id='busquedaLotesModoUsuario' type='text' placeholder='Buscar...' style='flex: 1; padding: 8px; border-radius: 7px; border: 1.2px solid #b0b8c9; font-size: 1em;'>
+        `;
+
+        // Insertar filtros antes de la tabla
+        todosDiv.innerHTML = '';
+        todosDiv.appendChild(filtrosDiv);
+
+        let tabla = `<table style='width:100%;border-collapse:collapse;font-size:0.98em;'>`;
+        tabla += `<tr style='background:#e3f0ff;color:#1976d2;'>
+                    <th style='border:1px solid #b6c6e3;padding:4px;'>Id lote</th>
+                    <th style='border:1px solid #b6c6e3;padding:4px;'>Nombre</th>
+                    <th style='border:1px solid #b6c6e3;padding:4px;'>Área</th>
+                    <th style='border:1px solid #b6c6e3;padding:4px;'>Estado</th>
+                    <th style='border:1px solid #b6c6e3;padding:4px;'>Acción</th>
+                  </tr>`;
+
+        lotes.forEach((lote, idx) => {
+          const idLoteValue = lote['Id lote'] || '';
+          const nombreValue = lote['Nombre'] || '';
+          const areaValue = lote['Área'] || '';
+          const estadoValue = (lote['Estado'] || '').toLowerCase();
+          let color = '#1976d2';
+          let bg = '#f5faff';
+
+          if (estadoValue === 'rechazado') { color = '#d32f2f'; bg = '#ffebee'; }
+          else if (estadoValue === 'validado') { color = '#388e3c'; bg = '#e8f5e9'; }
+
+          tabla += `<tr>` +
+                    `<td style='border:1px solid #b6c6e3;padding:4px;'>${idLoteValue}</td>` +
+                    `<td style='border:1px solid #b6c6e3;padding:4px;'>${nombreValue}</td>` +
+                    `<td style='border:1px solid #b6c6e3;padding:4px;'>${areaValue}</td>` +
+                    `<td style='border:1px solid #b6c6e3;padding:4px;color:${color};background:${bg};font-weight:600;'>${lote['Estado'] || ''}</td>` +
+                    `<td style='border:1px solid #b6c6e3;padding:4px;'>
+                      <button type='button' class='ver-resumen-todos-btn' data-idx='${idx}' title='Ver resumen' style='background:none;border:none;cursor:pointer;font-size:1.2em;color:${color};'>
+                        <span style='font-size:1.3em;'>&#x1F50D;</span>
+                      </button>
+                    </td>` +
+                  `</tr>`;
+        });
+
+        tabla += `</table>`;
+        todosDiv.innerHTML += tabla;
+
+        // Función de filtros para lotes
+        function renderTablaLotesModoUsuario() {
+          const texto = document.getElementById('busquedaLotesModoUsuario').value.toLowerCase();
+          const estado = document.getElementById('filtroEstadoModoUsuario').value;
+          const fecha = document.getElementById('filtroFechaModoUsuario').value;
+
+          const filas = todosDiv.querySelectorAll('table tr');
+          filas.forEach((fila, index) => {
+            if (index === 0) return; // Saltar la cabecera
+
+            const columnas = fila.querySelectorAll('td');
+            const idLote = columnas[0]?.textContent.trim() || ''; // Columna 0 (Id lote)
+            const nombre = columnas[1]?.textContent.toLowerCase().trim() || ''; // Columna 1 (Nombre)
+            const area = columnas[2]?.textContent.toLowerCase().trim() || ''; // Columna 2 (Área)
+            const estadoFila = columnas[3]?.textContent.toLowerCase().trim() || ''; // Columna 3 (Estado)
+
+            let coincide = true;
+
+            // Filtro por texto (nombre, área,)
+            if (texto) {
+              coincide = (
+                idLote.toLowerCase().includes(texto) ||
+                nombre.includes(texto) ||
+                area.includes(texto)
+              );
+            }
+
+            // Filtro por estado
+            if (estado && coincide) {
+              coincide = estadoFila === estado;
+            }
+
+            // Filtro por fecha (busca en Id lote la fecha)
+            if (fecha && coincide) {
+              const fechaLote = idLote.split('-')[2]; // Extraer YYMMDD del Id lote
+              if (fechaLote && fechaLote.length === 6) {
+                const fechaInput = fecha.replace(/-/g, '').slice(2); // Convertir a YYMMDD
+                coincide = fechaLote === fechaInput;
+              } else {
+                coincide = false;
+              }
+            }
+
+            fila.style.display = coincide ? '' : 'none';
+          });
+        }
+
+        // Asignar eventos a los filtros
+        document.getElementById('filtroFechaModoUsuario').addEventListener('input', renderTablaLotesModoUsuario);
+        document.getElementById('filtroEstadoModoUsuario').addEventListener('change', renderTablaLotesModoUsuario);
+        document.getElementById('busquedaLotesModoUsuario').addEventListener('input', renderTablaLotesModoUsuario);
+
+        // Reasignar eventos a los botones 'Ver resumen' después de aplicar filtros
+        todosDiv.addEventListener('click', function(event) {
+          if (event.target.closest('.ver-resumen-todos-btn')) {
+            const btn = event.target.closest('.ver-resumen-todos-btn');
+            const idx = parseInt(btn.getAttribute('data-idx'));
+            const lote = lotes[idx];
+
+            if (!lote) return;
+
+            const estado = (lote['Estado'] || '').toLowerCase();
+            let color = '#1976d2';
+            let bg = '#f5faff';
+
+            if (estado === 'rechazado') { color = '#d32f2f'; bg = '#ffebee'; }
+            else if (estado === 'validado') { color = '#388e3c'; bg = '#e8f5e9'; }
+
+            const resumen = `<b>Resumen del registro:</b><br>` +
+              `Id lote: ${lote['Id lote'] || ''}<br>` +
+              `Nombre: ${lote['Nombre'] || ''}<br>` +
+              `Turno: ${lote['Turno'] || ''}<br>` +
+              `Área: ${lote['Área'] || ''}<br>` +
+              `Número Manifold: ${lote['Manifold'] || ''}<br>` +
+              `Número Línea: ${lote['Línea'] || ''}<br>` +
+              `Hora inicial: ${lote['Hora inicial'] || ''}<br>` +
+              `Hora final: ${lote['Hora final'] || ''}<br>` +
+              `Código: ${lote['Código'] || ''}<br>` +
+              `Producto: ${lote['Producto'] || ''}<br>` +
+              `Cilindros: ${lote['Cilindros'] || ''}`;
+
+            document.getElementById('resumen').innerHTML = `<div style='background:${bg};border:1.5px solid ${color};border-radius:9px;box-shadow:0 2px 8px rgba(25,118,210,0.06);padding:14px 18px;color:${color};font-size:1.08em;font-weight:500;text-align:left;'>${resumen}</div>`;
+          }
+        });
+      })
+      .catch(() => {
+        todosDiv.innerHTML = '<span style="color:#d32f2f;">No se pudo obtener la lista de lotes (modo usuario).</span>';
+      });
+  });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const accessValidateBtn = document.getElementById('access-validate');
+  const resumenDiv = document.getElementById('resumen');
+
+  accessValidateBtn.addEventListener('click', function() {
+    const enteredKey = document.getElementById('supervisor-key').value.trim();
+    const supervisorKeys = {
+      "Fernado Moreno": '4098',
+      "Christian Molina": '11680',
+      "Humberto Huerta": '11907',
+      "Jose Zapata": '11014'
+    };
+
+    if (Object.values(supervisorKeys).includes(enteredKey)) {
+      const nombreSupervisor = Object.keys(supervisorKeys).find(key => supervisorKeys[key] === enteredKey);
+
+      // Mostrar mensaje de bienvenida con diseño similar al estado "pendiente"
+      resumenDiv.innerHTML = `
+        <div style="background:#f5faff;border:1.5px solid #1976d2;border-radius:9px;box-shadow:0 2px 8px rgba(25,118,210,0.06);padding:14px 18px;color:#1976d2;font-size:1.08em;font-weight:500;text-align:left;">
+          👋 Bienvenido, <b>${nombreSupervisor}</b>, al <b>Modo Supervisor</b>. Aquí puedes:
+          <ul style="margin-top:10px;padding-left:20px;">
+            <li>🔍 Ver todos los lotes registrados.</li>
+            <li>✅ Validar lotes registrados.</li>
+            <li>❌ Rechazar lotes incorrectos.</li>
+            <li>✏️ Corregir la cantidad de cilindros en lotes rechazados.</li>
+          </ul>
+          ¡Gracias por supervisar el proceso!
+        </div>
+      `;
+    }
+  });
+});
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Map of codes to products
+    const codigoProductoMap = {
+      "122": "ARGON LIQUIDO EN DEWARS",
+      "130": "M3. OXIGENO LIQUIDO DEWARE",
+      "131": "M3. NITROGENO LIQUIDO DEWARE",
+      "133": "NITROGENO LIQUIDO DEWAR 22 PSI",
+      "138": "M3 NITROGENO DEWAR ABIERTO",
+      "206": "M3. OXIGENO MEDICIN.LIQUID.THERMO DW",
+      "239": "NITR?GENO INDUSTRIAL MEGADEWAR 230L",
+      "246": "NITROGENO SPARKLASER DEWAR 230L (350PSI)",
+      "247": "NITROGENO LIQ FRESCOPACK DEWAR 230LTS (22 PSI)",
+      "270": "NITROGENO IND. LIQUIDO MINIBULK 230 LTS.",
+      "385": "CO2 INDUSTRIAL LIQUIDO DEWAR 230LTS (350PSI)",
+      "386": "NITROGENO 4.7 LIQ DEWAR 230LTS (350PSI)",
+      "387": "NITROGENO LIQUIDO FRESCOPACK DEWAR 230LTS (350PSI)",
+      "388": "NITROGENO LIQUIDO INDUSTRIAL DEWAR 230LTS (350PSI)",
+      "389": "OXIGENO LIQUIDO SPARK LASER ASISTENCIA DEWAR 230LT",
+      "396": "ARGON INDUSTRIAL LIQUIDO DEWAR 230LTS (350PSI)",
+      "397": "OXIGENO INDUSTRIAL LIQUIDO  DEWAR 230LTS (350PSI)",
+      "398": "OXIGENO MEDICINAL LIQUIDO DEWAR 230 LTS (350PSI)",
+      "433": "BIOXIDO DE CARBONO CON SIFON",
+      "443": "CO2 USP",
+      "445": "BIOXIDO DE CARBONO GASEOSO GRADO USP CIL C/SIFON",
+      "446": "CO2 (BIOXIDO DE CARBONO) CON SIFON 9 KGS",
+      "449": "CO2 FG LIQUIDO DEWAR 230 LTS ( 350 PSI )",
+      "486": "NITROGENO LIQUIDO ULTRA ALTA PUREZA DEWAR 230 LTS",
+      "601": "OXIGENO MEDICINAL USP E",
+      "602": "NITROGENO GRADO MEDICINALLIQUIDO",
+      "603": "NITROGENO GRADO MEDICINAL GASEOSO",
+      "604": "CARGA DE NITROGENO GRADO MEDICINAL LIQUIDO PORTATI",
+      "605": "BIOXIDO DE CARBONO USP (CO2-USP)",
+      "614": "CARGA DE OXIGENO GASEOSO INDUSTRIAL PORTATIL",
+      "625": "NITROGENO GRADO MEDICINAL LIQUIDO",
+      "630": "CARGA DE CO2 USP BT-20 2.0 KG",
+      "631": "CARGA DE CO2 USP BT-40",
+      "632": "CARGA DE CO2 USP BT-80",
+      "640": "CARGA DE CO2 USP D 1 KGS",
+      "641": "CO2 USP E VALVULA YUGO 2.0 KG",
+      "651": "CARGA DE OXIGENO MEDICINAL USP BT-20",
+      "652": "CARGA DE OXIGENO MEDICINAL USP BT-40",
+      "653": "CARGA DE OXIGENO MEDICINAL USP BT-80",
+      "654": "CARGA DE OXIGENO MEDICINAL USP M",
+      "655": "CARGA DE OXIGENO MEDICINAL USP E TODO EN UNO",
+      "658": "OXIGENO MEDICINAL USP \" E \"  DE 0.682 M3",
+      "659": "OXIGENO MEDICINAL USP \" M \" DE 3.45 M3",
+      "661": "CARGA DE NITROGENO GRADO MEDICINAL BT-20",
+      "663": "CARGA DE NITROGENO GRADO MEDICINAL BT-80",
+      "672": "NITROGENO GRADO MEDICINAL LIQUIDO THERMO PORT 4 LT",
+      "675": "NITROGENO MEDICINAL L?QUIDO DEWAR 230 LTS (22 PSI)",
+      "701": "CARGA DE OXIGENO 1 M3",
+      "702": "CARGA DE OXIGENO 1.5 M3",
+      "703": "CARGA DE OXIGENO 2.0 M3",
+      "704": "CARGA DE OXIGENO INDUSTRIAL DE 3 M3",
+      "710": "CARGA DE NITROGENO 1 M3",
+      "711": "CARGA DE NITROGENO 1.5 M3",
+      "712": "CARGA DE NITROGENO 2.0 M3",
+      "713": "CARGA DE NITROGENO INDUSTRIAL DE 3 M3",
+      "740": "CARGA DE ARGON 1 M3",
+      "741": "CARGA DE ARGON 2 M3",
+      "742": "CARGA DE ARGON 3 M3",
+      "750": "CARGA DE HIDROGENO 1 M3",
+      "760": "CARGA DE CO2 1 KGS.",
+      "761": "CARGA DE CO2 2 KGS.",
+      "762": "CARGA DE CO2 4 KGS.",
+      "766": "CILINDRO CO2 KOF 20 L.",
+      "801": "RECARGA DE OXIGENO MEDICINAL DE 247 LTS.",
+      "802": "RECARGA DE OXIGENO MEDICINAL DE 415 LTS.",
+      "803": "RECARGA DE OXIGENO MEDICINAL DE 682 LTS.",
+      "805": "RECARGA DE OXIGENO MEDICINAL DE 1725 LTS.",
+      "809": "RECARGA DE OXIGENO MEDICINAL DE 3450 LTS.",
+      "811": "CARGA DE RECARGA DE OXIGENO INFRALIFE .172 LTS",
+      "32005": "AIRE CERO/UAP",
+      "32015": "AIRE EXTRA SECO",
+      "32016": "CARGA DE AIRE EXTRASECO (C.MIN.)",
+      "32024": "INFRA AR MIXX ( ARGON GRADO SOLDADURA 6 M3 )",
+      "32025": "INFRA AR MIXX ( ARGON GRADO SOLDADURA )",
+      "32026": "CARGA DE ARGON ULTRA ALTA PUREZA (CA.MIN.)",
+      "32029": "ARGON ALTA PUREZA",
+      "32030": "ARGON 4.7 LIQ  DEWAR",
+      "32031": "AR MIXX ARGON GRADO SOLDADURA",
+      "32032": "ARGON 4.8 10 M3 A",
+      "32033": "ARGON ULTRA ALTA PUREZA 10 M3",
+      "32035": "ARGON 4.8 A",
+      "32040": "ARGON ULTRA ALTA PUREZA",
+      "32045": "ARGON ULTRA ALTA PUREZA LIQUIDO",
+      "32046": "CARGA DE ARGON 4.7 (C.M.)",
+      "32063": "CARGA DE CARBOGENO 20%",
+      "32065": "CARGA DE CARBOGENO 5%",
+      "32069": "HELIO INDUSTRIAL 8.5 MTS",
+      "32070": "CARGA DE INFRA FRESCO PACK",
+      "32071": "HELIO INDUSTRIAL 3.5M3",
+      "32072": "HELIO INDUSTRIAL 6M3",
+      "32073": "HELIO INDUSTRIAL 8.5M3",
+      "32075": "HELIO GLOBERO 6M",
+      "32076": "HELIO GLOBERO BT-80 2M",
+      "32077": "HELIO GLOBERO DE 8.5M",
+      "32079": "HELIO 4.7 6M3",
+      "32080": "HELIO 4.7 A",
+      "32081": "CARGA DE HELIO 4.7 (C.M.)",
+      "32090": "HELIO 4.8 A",
+      "32091": "CARGA DE HELIO 4.8 (C.M.)",
+      "32093": "HELIO UAP 4.1M3",
+      "32094": "HELIO UAP 6M3",
+      "32095": "HELIO ULTRA ALTA PUREZA",
+      "32096": "CARGA DE HELIO UAP (C.M.)",
+      "32098": "HELIO 4.8 6.0 M3 B",
+      "32099": "HIDROGENO ALTA PUREZA",
+      "32100": "HIDROGENO 4.8 B",
+      "32101": "CARGA DE HIDROGENO 4.8 (C.M.)",
+      "32105": "HIDROGENO EXTRA SECO",
+      "32110": "CARGA DE HIDROGENO CERO/ULTRA ALTA PUREZA",
+      "32111": "CARGA DE HIDROGENO CERO UAP CARGA MINIMA",
+      "32120": "NITROGENO 4.7 A",
+      "32121": "CARGA DE N2 AP CARGA MINIMA",
+      "32123": "NITROGENO AP 6.0 M3",
+      "32125": "NITROGENO 4.7 LIQ  DEWAR",
+      "32129": "CARGA DE NITROGENO 4.7 A",
+      "32135": "NITROGENO 4.8  A",
+      "32136": "CARGA DE N2 4.8 (C.M.)",
+      "32140": "NITROGENO 4.8 LIQ DEWAR",
+      "32145": "NITROGENO ULTRA ALTA PUREZA",
+      "32146": "CARGA DE N2 UAP (CA.MIN.)",
+      "32148": "NITROGENO UAP 6.0 M3",
+      "32150": "NITROGENO ULTRA ALTA PUREZA LIQUIDO",
+      "32151": "FRESCOPACK LIQUIDO",
+      "32152": "CARGA DE NITROGENO LIQUIDO GRADO ALIMENTICIO",
+      "32153": "FRESCOPACK LIQUIDO TANQUE THERMO",
+      "32159": "OXIGENO CORTE LASER",
+      "32160": "OXIGENO EXTRA SECO",
+      "32170": "OXIGENO RESPIRABLE P/AVIACION",
+      "33040": "CARGA DE MEZCLA AR 25%/HE 75%",
+      "33041": "CARGA DE MEZCLA AR 60% HE 40%",
+      "33042": "CARGA DE MEZCLA AR 75%/HE 25%",
+      "33043": "CARGA DE MEZCLA 70% AR/HE 30%",
+      "33055": "CARGA DE MEZCLA AR 90%/CO2 10%",
+      "33060": "CARGA DE MEZCLA AR 65%/H2 35%",
+      "33061": "CARGA DE MEZCLA AR 90%/H2 10%",
+      "33062": "CARGA DE MEZCLA AR 93%/H2 7%",
+      "33063": "CARGA DE MEZCLA AR 96%/H2 4%",
+      "33064": "CARGA DE MEZCLA AR 98%/H2 2%",
+      "33065": "CARGA DE H2 1% / AR BAL.",
+      "33070": "CARGA DE MEZCLA AR 7.5%/CO2 2.5%/HE 90%",
+      "33072": "CARGA DE H2 5% / AR BAL.",
+      "33148": "CARGA DE COOKING PACK III (MEZCLA CO2 35%/N2 BAL.)",
+      "33194": "CARGA DE COOKING PACK II (MEZCLA CO2 20%/N2  BAL.)",
+      "33195": "CARGA DE INFRA COOKING PACK",
+      "33196": "CARGA DE COOKING PACK IV",
+      "33197": "CARGA DE MEZCLA CO2 5%/N2 BAL",
+      "33198": "CARGA DE INFRA PANI PACK",
+      "33221": "MEZCLA LASER ESP.(CO2 5%/HELIO 40%/N2 55%BAL.)",
+      "33249": "CARGA DE O2 8% / N2 BAL. (CA. MIN.)",
+      "33261": "CARGA DE H2 1% / N2 BAL.",
+      "33277": "CARGA DE H2 2% / N2 BAL.",
+      "33278": "CARGA DE H2 10% / N2 BAL.",
+      "33281": "CARGA DE MEZCLA H2 20%/N2 80%",
+      "33284": "CARGA DE MEZCLA H2 4%/N2 96%",
+      "33285": "CARGA DE MEZCLA H2 40%/N2 60%",
+      "33286": "CARGA DE MEZCLA H2 5%/N2 95%",
+      "33287": "CARGA DE MEZCLA H2 50%/N2 50%",
+      "33290": "CARGA DE H2 1%/N2 99%",
+      "33299": "CARGA DE N2 20% / CO2 BAL.",
+      "33310": "CARGA DE MEZCLA HE 10%/N2 90%",
+      "33331": "CARGA DE MEZCLA N2 79%/O2 21%",
+      "33397": "CARGA DE COUGAR 77-TM",
+      "33420": "CARGA DE MEZCLA PARA SOLDAR C-1",
+      "33421": "CARGA DE WELDER C-1 (CA.MIN.)",
+      "33425": "CARGA DE MEZCLA PARA SOLDAR C-2",
+      "33426": "CARGA DE WELDER C-3",
+      "33435": "CARGA DE WELDER C-5",
+      "33445": "CARGA DE MEZCLA PARA SOLDAR C-7",
+      "33455": "CARGA DE WELDER X-1",
+      "33460": "CARGA DE DIVERTIGLOBO",
+      "33500": "CARGA DE MEZCLAS VARIAS PARA PRUEBAS",
+      "34045": "CARGA DE HELIO CROMATOGRAFICO APCI",
+      "41008": "CARGA DE N2 30%/HE BAL.",
+      "41155": "CARGA DE H2 10%/N2 BAL.",
+      "41166": "CARGA DE AR 50%/HE 50%",
+      "41231": "CARGA DE N2 ULTRA ALTA PUREZA (CA.MIN.)",
+      "41276": "NITROGENO LIQ. DEWAR ALTA PRESION",
+      "41277": "CARGA DE HE 30%/N2 BAL.",
+      "41316": "CARGA DE INFRA -FERRO G (10 M3)",
+      "41317": "CARGA DE INFRA - FERRO D (9.5 M3)",
+      "41319": "CARGA DE INFRA -INOXX TAG (9.5 M3)",
+      "41320": "CARGA DE INFRA MIXX 200/25 (10.5 M3)",
+      "41321": "CARGA DE INFRA MIXX 200/20 (10 M3)",
+      "41322": "CARGA DE INFRA MIXX 200/O5 (9.5 M3)",
+      "41323": "CARGA DE INFRA MIXX 200/2 (9.5 M3)",
+      "41324": "CARGA DE INFRA MIXX 200/O2 (9.5 M3)",
+      "41325": "CARGA DE INFRA MIXX 200/15 (10 M3)",
+      "41326": "CARGA DE INFRA MIXX 200/8 (9.5 M3)",
+      "41327": "CARGA DE INFRA MIXX 200/10 (10 M3)",
+      "41328": "CARGA DE INFRA ALUMIXX 8.5 M3",
+      "41329": "CARGA DE INFRA MIXX 200/5 (9.5 M3)",
+      "41330": "CARGA DE INFRA MIXX 72 C (9.5 M3)",
+      "41335": "CARGA DE INFRA INNOX TAG X-1 (9.0 M3)",
+      "41336": "CARGA DE INFRA MIXX 200/18 (10 M3)",
+      "41674": "CARGA DE OXIGENO EXTRA SECO (CA.MIN.)",
+      "41681": "HE 20% / AR. BAL.",
+      "41784": "CARGA DE HE 40%/N2 BAL.",
+      "41855": "CARGA DE H2 15%/N2 BAL.",
+      "41975": "CARGA DE N2 40%/HE BAL.",
+      "41981": "CARGA DE HE 25%/N2 BAL.",
+      "50032": "CARGA DE MP H2 40%/N2 BAL.",
+      "50130": "HE 50% / N2 BAL",
+      "50469": "CARGA DE H2 5%/N2 BAL. (CARGA MINIMA)",
+      "50493": "CARGA DE CO2 25%/AR BAL",
+      "50548": "CARGA DE COOKING PACK (CARG MINIMA)",
+      "50550": "CARGA DE PANIPACK (CARGA MINIMA)",
+      "50568": "CARGA DE CO2 EXTRASECO DEWAR",
+      "50578": "CARGA DE FRESCOPACK ( CARGA MINIMA)",
+      "50685": "CARGA DE CO2 25%/AR BAL.(C.M.)",
+      "50709": "CARGA DE MEZCLA ESPECIAL 20%/HE 80%/N2",
+      "50716": "BIOXIDO DE CARBONO FG 169 KG",
+      "50792": "CARGA DE H2 40% NITROGENO BAL 6.5 M3",
+      "50967": "CARGA DE CO2 FG  9KG",
+      "51052": "CARGA DE INFRA MIXX 200/25 6M3",
+      "51132": "CARGA DE SPARK LASER O2 ASISTENCIA CL",
+      "51157": "CARGA DE HE 50%/N2 BAL. (A)",
+      "51304": "SPARK LASER N2 ASISTENCIA DW",
+      "51306": "SPARK LASER O2 ASISTENCIA DW",
+      "51321": "SPARK LASER N2 ASISTENCIA CL",
+      "51339": "CARGA DE SPARK LASER HE PROTEC",
+      "51340": "CARGA DE SPARK LASER AR PROTEC",
+      "51376": "SPARK LASER HE RESONADOR VPR",
+      "51377": "SPARK LASER N2 RESONADOR VPR",
+      "51384": "CARGA DE CO2 FG C.M.",
+      "51400": "SPARK LASER O2 ASISTENCIA CL-M",
+      "51409": "SPARK LASER HE PROTECT-M",
+      "51410": "SPARK LASER AR PRTOTECT-M",
+      "51426": "ARGON 4.8 VPR A",
+      "51552": "HELIO UAP HELIX BROOKS",
+      "51580": "CARGA DE CO2 3%/AR 97% BAL.",
+      "51581": "CARGA DE CO2 BEBIDAS",
+      "51624": "CARGA DE ARGON (AR)ICP 99.999%* A",
+      "51628": "HELIO UAP PARA ARRASTRE",
+      "51662": "CARGA DE CO2 ICEE",
+      "51759": "CO2 GRADO ALIMENTICIO CON SIFON 9 KG",
+      "51797": "BIOXIDO DE CARBONO 45.36KG C/PH",
+      "51802": "CO2 FG 20 KGS",
+      "51807": "CO2 EXTRA SECO C/SIFON 25 KG",
+      "51861": "COOKING PACK 10",
+      "51872": "MESP H2 5%/N2 BAL.",
+      "51889": "H2 30%/N2 BAL. CM",
+      "51896": "H2  5% / N2 BAL",
+      "51928": "MEZCLA 98% ARGON/2% NITROGENO",
+      "51954": "30% HELIO / N2 BAL.",
+      "51973": "HE 10%, N2 BAL. (CYL  A)",
+      "52014": "OXIGENO EXTRA SECO CILINDRO A",
+      "52023": "CO2 30%, N2 BAL.",
+      "52100": "INFRA AEI ARGON FL",
+      "52128": "INFRA GALVAMIXX",
+      "52146": "HE ULTRA ALTA PUREZA PLUS",
+      "52154": "HE ULTRA ALTA PUREZA PLUS",
+      "52176": "CO2 50% / AR BAL",
+      "52291": "CO2 15% / N2 BAL",
+      "52423": "NITROGENO 4.7 30AL",
+      "52584": "HE 20% / N2 BAL",
+      "52652": "INFRA ALUMIXX D",
+      "52680": "AR MIXX PORTATIL",
+      "52708": "ARGON 4.7 A",
+      "52709": "ARGON 4.7 A",
+      "52729": "INFRA AR MIXX DEWAR",
+      "52764": "INFRA MIXX 200/25 PORTATIL",
+      "52767": "SPARK LASER ARGON PROTECT-M 10 M3",
+      "52787": "CARBO MIXX ( CO2 GRADO SOLDADURA )",
+      "52823": "INFRA CARBO MIXX DW ( CO2 LIQUIDO GRADO SOLDADURA)",
+      "52854": "CARGA DE SPARK LASER AR PROTEC (10M3)",
+      "52855": "CARGA DE ARGON (AR)ICP 99.999%* A (10M3)",
+      "52958": "HELIO 4.7 9M3",
+      "52959": "HELIO 4.8 9M3",
+      "52960": "HELIO ULTRA ALTA PUREZA 9M3",
+      "52961": "SPARK LASER HE RESONADOR VPR 9M3",
+      "52962": "SPARK LASER HE PROTECT-M 9M3",
+      "52963": "HELIO UAP HELIX BROOKS 9M3",
+      "52964": "HELIO UAP PARA ARRASTRE 9M3",
+      "52965": "HE ULTRA ALTA PUREZA PLUS 9M3",
+      "52981": "R744 CIL 25 KG C/SIFON",
+      "53012": "H2 3% / HE BAL",
+      "53021": "ARGON INDUSTRIAL EN RACK DE 12 CILINDROS DE 9.5 MT",
+      "53022": "ARGON ARMIXX EN RACK DE 12 CILINDROS DE 10 MTS",
+      "53023": "CO2 50% / AR BAL EN RACK DE 12 CILINDROS DE 5.5 MT",
+      "53024": "HELIO 4.7 RACK 12 CILINDROS DE 9 M3",
+      "53025": "HIDROGENO EXTRASECO EN RACK DE 12 CILINDROS DE 6 M",
+      "53026": "HIDROGENO INDUSTRIAL EN RACK DE 12 CILINDROS DE 7.",
+      "53027": "INFRA MIXX 200/25 EN RACK DE 12 CILINDROS DE 10.5",
+      "53028": "NITROGENO 4.7 RACK 12 CILINDROS DE 9",
+      "53029": "NITROGENO INDUSTRIAL EN RACK DE 12 CILINDROS DE 9",
+      "53030": "SPARK LASER ARGON PROTECT-M EN RACK DE 12 CILINDRO",
+      "53031": "SPARK LASER HE PROTECT-M EN RACK DE 12 CILINDROS D",
+      "53032": "SPARK LASER N2 ASISTENCIA CL EN RACK DE 12 CILINDR",
+      "53033": "SPARK LASER O2 ASISTENCIA PACK EN RACK DE 12 CILIN",
+      "53078": "INFRA INOXX TAG X-1 EN RACK DE 12 CIL DE 9.0 M3",
+      "53085": "HELIO INDUSTRIAL RACK DE 12 CIL 8.5M3",
+      "53089": "MEZCLA H2 5% / N2 95% RACK DE 12 CILINDROS 8.5 MTS",
+      "53090": "H2 rack extra seco",
+      "53091": "HIDROGENO 4.8 RACK 12 CILINDROS 6 M3",
+      "53092": "NITROGENO ULTRA ALTA PUREZA  RACK 12 CILINDRO 9 M3",
+      "53093": "OXIGENO INDUSTRIAL EN RACK  12 CILINDROS DE 9.5 M3",
+      "53094": "INFRA MIXX 200/8 EN RACK DE 12 CILINDROS DE 9.5 MT",
+      "53095": "INFRA FERRO D EN RACK DE 12 CILINDROS DE 9.5 MTS",
+      "53096": "ARGON ULTRA ALTA PUREZA EN RACK 12 CILINDROS 10 MT",
+      "53097": "INFRA MIXX 200/10 EN RACK DE 12 CILINDROS 10 MTS",
+      "53098": "INFRA MIXX 200/18 EN RACK DE 12 CILINDROS  10 MTS",
+      "53099": "INFRA MIXX 200/5 EN RACK DE 12 CILINDROS 9.5 MTS",
+      "53100": "INFRA MIXX 200/O2 EN RACK DE 12 CILINDROS 9.5 MTS",
+      "53103": "HELIO ULTRA ALTA PUREZA RACK 12 CILINDROS 9 M3",
+      "53116": "HELIO PREMIER",
+      "53123": "MEZCLA HE 30 % /N2 BAL EN RACK 12 CILINDROS 8 M3",
+      "53151": "INFRA MIXX 200/20 EN RACK DE 12 CILINDROS DE 10 M3",
+      "53179": "MEZCLA DE H2 3% /  HE BAL EN RACK DE 12 CIL 8.5 M3",
+      "53184": "MEZCLA N2 40% / HE BAL EN RACK 12 CIL DE 6M3",
+      "53442": "HELIO PREMIER 6M3",
+      "53589": "MEZCLA HELIO 50% BALANCE NITR?GENO EN RACK DE 12 C",
+      "54005": "CO2 10% / N2 BAL",
+      "54033": "CO2 3% / N2 BAL",
+      "54034": "CO2 6% / N2 BAL",
+      "101030": "OXIGENO INDUSTRIAL 3.0 MTS",
+      "101060": "OXIGENO INDUSTRIAL 6 MTS",
+      "101095": "OXIGENO INDUSTRIAL 9.5",
+      "101113": "OXIGENO INDUSTRIAL 9.5 MTS",
+      "101114": "OXIGENO INDUSTRIAL 6 M3",
+      "101160": "OXIGENO INDUSTRIAL 6 M3 VALVULA CGA",
+      "101195": "OXIGENO INDUSTRIAL 9.5 M3 VALVULA CGA",
+      "103060": "NITROGENO GAS 6 MTS VAL CGA 580",
+      "103090": "NITROGENO GAS 9 MTS VAL CGA 580",
+      "103112": "NITROGENO GAS 9 MTS.",
+      "104060": "HIDROGENO INDUSTRIAL 6 M3",
+      "104075": "HIDROGENO INDUSTRIAL 7.5 M3",
+      "105060": "ARGON 6 MTS VAL CGA 580",
+      "105090": "ARGON PURO 9 MTS",
+      "105095": "ARGON 9.5 MTS VAL CGA 580",
+      "201010": "OXIGENO MEDICINAL EN CIL. MCA INFRA 10 MTS",
+      "201030": "OXIGENO MEDICINAL EN CIL MCA INFRA 3 MTS",
+      "201060": "OXIGENO MEDICINAL EN CIL MCA INFRA 6 MTS",
+      "201085": "OXIGENO MEDICINAL EN CIL MCA INFRA 8.5 MTS",
+      "201095": "OXIGENO MEDICINAL EN CIL MCA INFRA 9.5 MTS",
+      "431008": "CO2 INDUSTRIAL 8 KGS",
+      "431009": "CO2 INDUSTRIAL 9 KGS",
+      "431010": "CO2 10 KG",
+      "431012": "CO2 INDUSTRIAL 12 KGS",
+      "431015": "CO2 INDUSTRIAL 15 KGS",
+      "431016": "CO2 INDUSTRIAL 16 KGS",
+      "431020": "CO2 INDUSTRIAL 20 KG",
+      "431022": "CO2 INDUSTRIAL 22 KGS",
+      "431025": "CO2 INDUSTRIAL 25 KGS",
+      "431030": "CO2 INDUSTRIAL 30 KGS",
+      "431045": "CO2 INDUSTRIAL 45 KG",
+      "432169": "CO2 DEWAR 169 KGS",
+      "3000660": "HELIO GRADO 6.0 9 M3 A",
+      "3000668": "Mezcla 21% He Balance N2 Cilindro tipo A",
+      "3000694": "MEZCLA 5% H2 BALANCE N2 EN RACK CILINDROS DE 6 M3",
+      "3000844": "SIX SPARK LASER NITROGENO",
+      "3001309": "INFRA Ar MIXX PLUS",
+      "3001310": "INFRA MIXX PLUS 200/20",
+      "3001313": "INFRA MIX 200/O5 RACK 12 CIL,(114 M3)",
+      "3001384": "INFRA ALUMIXX 25 RACK",
+      "3001443": "H2 UAP/CERO EN RACK 12 CILINDROS DE  6 M3",
+      "50656": "CO2 FG",
+      "3001554": "H2 UAP/CERO EN RACK 12 CILINDROS DE  7.5 M3"
+    };
+
+    // Get references to the input fields
+    const codigoInput = document.querySelector('input[name="codigo"]');
+    const productoInput = document.querySelector('input[name="producto"]');
+    const cilindrosInput = document.querySelector('input[name="cilindros"]');
+
+    // Disable the 'Producto' field
+    productoInput.readOnly = true;
+
+    // Add event listener to the 'codigo' input field
+    codigoInput.addEventListener('input', function() {
+      const codigo = codigoInput.value.trim(); // Get the entered code
+      if (codigoProductoMap[codigo]) {
+        productoInput.value = codigoProductoMap[codigo]; // Auto-fill the product field
+        cilindrosInput.focus(); // Move the cursor to the 'Cilindros' field
+      } else {
+        productoInput.value = ""; // Clear the product field if the code is invalid
+      }
+    });
+  });
+</script>
+</body>
+</html>
