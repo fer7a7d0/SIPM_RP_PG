@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Registro #{{ registro.id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-pencil me-2"></i>Editar Registro #{{ registro.id }}</h2>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('detalle_registro', registro_id=registro.id) }}" class="btn btn-outline-info">
+            <i class="bi bi-eye me-1"></i>Ver Detalle
+        </a>
+        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Volver
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('editar_registro', registro_id=registro.id) }}" novalidate>
+            <div class="row g-3">
+                <!-- Datos generales -->
+                <div class="col-12">
+                    <h5 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-info-circle me-1"></i>Datos Generales
+                    </h5>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="fecha" class="form-label fw-semibold">Fecha <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="fecha" name="fecha"
+                           value="{{ registro.fecha.strftime('%Y-%m-%d') }}" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="turno" class="form-label fw-semibold">Turno <span class="text-danger">*</span></label>
+                    <select class="form-select" id="turno" name="turno" required>
+                        <option value="">-- Seleccione --</option>
+                        <option value="Mañana" {% if registro.turno == 'Mañana' %}selected{% endif %}>Mañana</option>
+                        <option value="Tarde" {% if registro.turno == 'Tarde' %}selected{% endif %}>Tarde</option>
+                        <option value="Noche" {% if registro.turno == 'Noche' %}selected{% endif %}>Noche</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="linea" class="form-label fw-semibold">Línea de Producción <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="linea" name="linea"
+                           value="{{ registro.linea }}" required>
+                </div>
+
+                <!-- Producto -->
+                <div class="col-12 mt-3">
+                    <h5 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-box-seam me-1"></i>Producto
+                    </h5>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="producto" class="form-label fw-semibold">Nombre del Producto <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="producto" name="producto"
+                           value="{{ registro.producto }}" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="lote" class="form-label fw-semibold">Número de Lote <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="lote" name="lote"
+                           value="{{ registro.lote }}" required>
+                </div>
+
+                <!-- Cantidades -->
+                <div class="col-12 mt-3">
+                    <h5 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-123 me-1"></i>Cantidades
+                    </h5>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="cantidad_producida" class="form-label fw-semibold">Cantidad Producida <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="cantidad_producida" name="cantidad_producida"
+                               value="{{ registro.cantidad_producida }}" step="0.01" min="0.01" required>
+                        <select class="form-select" name="unidad" style="max-width: 100px;">
+                            <option value="kg" {% if registro.unidad == 'kg' %}selected{% endif %}>kg</option>
+                            <option value="ton" {% if registro.unidad == 'ton' %}selected{% endif %}>ton</option>
+                            <option value="l" {% if registro.unidad == 'l' %}selected{% endif %}>l</option>
+                            <option value="m3" {% if registro.unidad == 'm3' %}selected{% endif %}>m³</option>
+                            <option value="und" {% if registro.unidad == 'und' %}selected{% endif %}>und</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="cantidad_rechazada" class="form-label fw-semibold">Cantidad Rechazada</label>
+                    <input type="number" class="form-control" id="cantidad_rechazada" name="cantidad_rechazada"
+                           value="{{ registro.cantidad_rechazada }}" step="0.01" min="0">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Eficiencia Estimada</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="eficiencia_preview"
+                               value="{{ registro.eficiencia }}" readonly>
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <div class="form-text">Se calcula automáticamente.</div>
+                </div>
+
+                <!-- Personal -->
+                <div class="col-12 mt-3">
+                    <h5 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-people me-1"></i>Personal
+                    </h5>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="operador" class="form-label fw-semibold">Operador <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="operador" name="operador"
+                           value="{{ registro.operador }}" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="supervisor" class="form-label fw-semibold">Supervisor</label>
+                    <input type="text" class="form-control" id="supervisor" name="supervisor"
+                           value="{{ registro.supervisor or '' }}">
+                </div>
+
+                <!-- Observaciones -->
+                <div class="col-12 mt-3">
+                    <h5 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-chat-text me-1"></i>Observaciones
+                    </h5>
+                </div>
+
+                <div class="col-12">
+                    <label for="observaciones" class="form-label fw-semibold">Observaciones</label>
+                    <textarea class="form-control" id="observaciones" name="observaciones" rows="3">{{ registro.observaciones or '' }}</textarea>
+                </div>
+
+                <!-- Botones -->
+                <div class="col-12 mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-save me-1"></i>Actualizar Registro
+                    </button>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle me-1"></i>Cancelar
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function calcularEficiencia() {
+    const producida = parseFloat(document.getElementById('cantidad_producida').value) || 0;
+    const rechazada = parseFloat(document.getElementById('cantidad_rechazada').value) || 0;
+    const preview = document.getElementById('eficiencia_preview');
+
+    if (producida > 0) {
+        const eficiencia = (1 - rechazada / producida) * 100;
+        preview.value = eficiencia.toFixed(1);
+    } else {
+        preview.value = '';
+    }
+}
+
+document.getElementById('cantidad_producida').addEventListener('input', calcularEficiencia);
+document.getElementById('cantidad_rechazada').addEventListener('input', calcularEficiencia);
+</script>
+{% endblock %}

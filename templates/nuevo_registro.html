@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block title %}Nuevo Registro de Producción{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-plus-circle me-2"></i>Nuevo Registro de Producción</h2>
+    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Volver
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('nuevo_registro') }}" novalidate>
+            <div class="row g-3">
+                <!-- Datos generales -->
+                <div class="col-12">
+                    <h5 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-info-circle me-1"></i>Datos Generales
+                    </h5>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="fecha" class="form-label fw-semibold">Fecha <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="fecha" name="fecha"
+                           value="{{ form_data.get('fecha', '') }}" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="turno" class="form-label fw-semibold">Turno <span class="text-danger">*</span></label>
+                    <select class="form-select" id="turno" name="turno" required>
+                        <option value="">-- Seleccione --</option>
+                        <option value="Mañana" {% if form_data.get('turno') == 'Mañana' %}selected{% endif %}>Mañana</option>
+                        <option value="Tarde" {% if form_data.get('turno') == 'Tarde' %}selected{% endif %}>Tarde</option>
+                        <option value="Noche" {% if form_data.get('turno') == 'Noche' %}selected{% endif %}>Noche</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="linea" class="form-label fw-semibold">Línea de Producción <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="linea" name="linea"
+                           value="{{ form_data.get('linea', '') }}" placeholder="Ej: Línea 1, Reactor A" required>
+                </div>
+
+                <!-- Producto -->
+                <div class="col-12 mt-3">
+                    <h5 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-box-seam me-1"></i>Producto
+                    </h5>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="producto" class="form-label fw-semibold">Nombre del Producto <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="producto" name="producto"
+                           value="{{ form_data.get('producto', '') }}" placeholder="Nombre del producto" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="lote" class="form-label fw-semibold">Número de Lote <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="lote" name="lote"
+                           value="{{ form_data.get('lote', '') }}" placeholder="Ej: LOT-2024-001" required>
+                </div>
+
+                <!-- Cantidades -->
+                <div class="col-12 mt-3">
+                    <h5 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-123 me-1"></i>Cantidades
+                    </h5>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="cantidad_producida" class="form-label fw-semibold">Cantidad Producida <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="cantidad_producida" name="cantidad_producida"
+                               value="{{ form_data.get('cantidad_producida', '') }}"
+                               step="0.01" min="0.01" placeholder="0.00" required>
+                        <select class="form-select" name="unidad" style="max-width: 100px;">
+                            <option value="kg" {% if form_data.get('unidad', 'kg') == 'kg' %}selected{% endif %}>kg</option>
+                            <option value="ton" {% if form_data.get('unidad') == 'ton' %}selected{% endif %}>ton</option>
+                            <option value="l" {% if form_data.get('unidad') == 'l' %}selected{% endif %}>l</option>
+                            <option value="m3" {% if form_data.get('unidad') == 'm3' %}selected{% endif %}>m³</option>
+                            <option value="und" {% if form_data.get('unidad') == 'und' %}selected{% endif %}>und</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="cantidad_rechazada" class="form-label fw-semibold">Cantidad Rechazada</label>
+                    <input type="number" class="form-control" id="cantidad_rechazada" name="cantidad_rechazada"
+                           value="{{ form_data.get('cantidad_rechazada', '0') }}"
+                           step="0.01" min="0" placeholder="0.00">
+                    <div class="form-text">Dejar en 0 si no hubo rechazos.</div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Eficiencia Estimada</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="eficiencia_preview" readonly placeholder="--%">
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <div class="form-text">Se calcula automáticamente.</div>
+                </div>
+
+                <!-- Personal -->
+                <div class="col-12 mt-3">
+                    <h5 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-people me-1"></i>Personal
+                    </h5>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="operador" class="form-label fw-semibold">Operador <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="operador" name="operador"
+                           value="{{ form_data.get('operador', '') }}" placeholder="Nombre del operador" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="supervisor" class="form-label fw-semibold">Supervisor</label>
+                    <input type="text" class="form-control" id="supervisor" name="supervisor"
+                           value="{{ form_data.get('supervisor', '') }}" placeholder="Nombre del supervisor (opcional)">
+                </div>
+
+                <!-- Observaciones -->
+                <div class="col-12 mt-3">
+                    <h5 class="text-primary border-bottom pb-2">
+                        <i class="bi bi-chat-text me-1"></i>Observaciones
+                    </h5>
+                </div>
+
+                <div class="col-12">
+                    <label for="observaciones" class="form-label fw-semibold">Observaciones</label>
+                    <textarea class="form-control" id="observaciones" name="observaciones"
+                              rows="3" placeholder="Comentarios adicionales, incidencias, etc.">{{ form_data.get('observaciones', '') }}</textarea>
+                </div>
+
+                <!-- Botones -->
+                <div class="col-12 mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i>Guardar Registro
+                    </button>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle me-1"></i>Cancelar
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function calcularEficiencia() {
+    const producida = parseFloat(document.getElementById('cantidad_producida').value) || 0;
+    const rechazada = parseFloat(document.getElementById('cantidad_rechazada').value) || 0;
+    const preview = document.getElementById('eficiencia_preview');
+
+    if (producida > 0) {
+        const eficiencia = (1 - rechazada / producida) * 100;
+        preview.value = eficiencia.toFixed(1);
+    } else {
+        preview.value = '';
+    }
+}
+
+document.getElementById('cantidad_producida').addEventListener('input', calcularEficiencia);
+document.getElementById('cantidad_rechazada').addEventListener('input', calcularEficiencia);
+
+// Set today's date as default
+const fechaInput = document.getElementById('fecha');
+if (!fechaInput.value) {
+    const today = new Date().toISOString().split('T')[0];
+    fechaInput.value = today;
+}
+</script>
+{% endblock %}
